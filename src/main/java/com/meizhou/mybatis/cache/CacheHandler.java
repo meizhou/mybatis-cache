@@ -11,7 +11,7 @@ public class CacheHandler {
         for (String cacheKey : cacheConfig.getCacheKeys()) {
             Object value = cacheSql.getParameterMap().get(cacheKey);
             String key = cacheConfig.getVersion() + "." + cacheSql.getTable() + "." + cacheKey + ":" + value;
-            cacheConfig.getCacheClient().set(key.getBytes(), 0, (System.currentTimeMillis() + "").getBytes());
+            cacheConfig.getCacheClient().set(key.getBytes(), 30 * 3600 * 24, (System.currentTimeMillis() + "").getBytes());
         }
     }
 
@@ -23,13 +23,35 @@ public class CacheHandler {
             Object value = cacheSql.getParameterMap().get(cacheKey);
             if (value != null) {
                 String key = cacheConfig.getVersion() + "." + cacheSql.getTable() + "." + cacheKey + ":" + value;
-                String version = new String(cacheConfig.getCacheClient().get(key.getBytes()));
-                if (version.trim().length() > 0) {
-                    byte[] bytes = cacheConfig.getCacheClient().get((key + ":" + version).getBytes());
-                    if (bytes.length > 0) {
-                        return ProtostuffUtils.deserialize(bytes, Object.class);
+                byte[] version = cacheConfig.getCacheClient().get(key.getBytes());
+                if (version != null && version.length > 0) {
+                    byte[] bytes = cacheConfig.getCacheClient().get((key + ":" + new String(version) + ":" + md5Encoding(cacheSql.getSql())).getBytes());
+                    if (bytes != null && bytes.length > 0) {
+                        CacheResult response = ProtostuffUtils.deserialize(bytes, CacheResult.class);
+                        return response.getObject();
                     }
                 }
+                break;
+            }
+        }
+        return null;
+    }
+
+
+    public static Object setObject(CacheConfig cacheConfig, CacheSql cacheSql, Object object) {
+        if (cacheConfig == null) {
+            return null;
+        }
+        for (String cacheKey : cacheConfig.getCacheKeys()) {
+            Object value = cacheSql.getParameterMap().get(cacheKey);
+            if (value != null) {
+                String key = cacheConfig.getVersion() + "." + cacheSql.getTable() + "." + cacheKey + ":" + value;
+                byte[] version = cacheConfig.getCacheClient().get(key.getBytes());
+                if (version == null || version.length == 0) {
+                    version = (System.currentTimeMillis() + "").getBytes();
+                    cacheConfig.getCacheClient().set(key.getBytes(), 30 * 3600 * 24, version);
+                }
+                cacheConfig.getCacheClient().set((key + ":" + new String(version) + ":" + md5Encoding(cacheSql.getSql())).getBytes(), cacheConfig.getExpireTime(), ProtostuffUtils.serialize(new CacheResult(object)));
                 break;
             }
         }
@@ -51,31 +73,8 @@ public class CacheHandler {
                 str[k++] = "0123456789abcdef".charAt(byte0 & 15);
             }
             return new String(str);
-        } catch (Exception var9) {
+        } catch (Exception e) {
             return null;
         }
-    }
-
-    public static Object setObject(CacheConfig cacheConfig, CacheSql cacheSql, Object object) {
-        if (cacheConfig == null) {
-            return null;
-        }
-        for (String cacheKey : cacheConfig.getCacheKeys()) {
-            Object value = cacheSql.getParameterMap().get(cacheKey);
-            if (value != null) {
-                String key = cacheConfig.getVersion() + "." + cacheSql.getTable() + "." + cacheKey + ":" + value;
-                String version = new String(cacheConfig.getCacheClient().get(key.getBytes()));
-                if (version.trim().length() > 0) {
-                    version = System.currentTimeMillis() + "";
-                    cacheConfig.getCacheClient().set(key.getBytes(), 0, version.getBytes());
-                }
-                cacheConfig.getCacheClient().set((key + ":" + version + ":" + md5Encoding(cacheSql.getSql())).getBytes(), cacheConfig.getExpireTime(), ProtostuffUtils.serialize(object));
-            }
-        }
-        return null;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(new String(new byte[0]).length());
     }
 }

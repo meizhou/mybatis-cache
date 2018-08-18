@@ -60,5 +60,10 @@ public class ProtostuffUtils {
         }
     }
 
+    public static void main(String[] args) {
+        byte[] a = serialize(new CacheConfig());
+        System.out.println(deserialize(a, CacheConfig.class));
+    }
+
 
 }

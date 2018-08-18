@@ -33,7 +33,7 @@ public class CacheSql {
         Map<String, Object> parameterMap = new HashMap<String, Object>();
         for (TableStat.Condition entry : statVisitor.getConditions()) {
             if (entry.getOperator().equals("=")) {
-                parameterMap.put(entry.getColumn().getName(), entry.getValues().get(0));
+                parameterMap.put(entry.getColumn().getName().replaceAll("`",""), entry.getValues().get(0));
             }
         }
         cacheSql.setParameterMap(parameterMap);

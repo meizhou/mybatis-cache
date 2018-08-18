@@ -23,19 +23,8 @@ public class CacheExecutorInterceptor implements Interceptor {
 
     static {
         CacheConfig cacheConfig = new CacheConfig();
-        cacheConfig.setCacheClient(new ICacheClient() {
-            @Override
-            public byte[] get(byte[] key) {
-                System.out.println("get:" + new String(key));
-                return new byte[0];
-            }
-
-            @Override
-            public Boolean set(byte[] key, int exp, byte[] value) {
-                System.out.println("set:" + new String(key) + ":" + exp + ":" + new String(value));
-                return null;
-            }
-        });
+        ICacheClient cacheClient = new RedisCacheClient("127.0.0.1", 6379, "123456");
+        cacheConfig.setCacheClient(cacheClient);
         cacheConfig.setTableName("shop");
         cacheConfig.setCacheKeys(Arrays.asList("id"));
         cacheConfig.setVersion("v20");
