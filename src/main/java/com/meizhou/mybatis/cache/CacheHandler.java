@@ -4,7 +4,7 @@ import java.security.MessageDigest;
 
 public class CacheHandler {
 
-    public static void getUpdateKey(CacheConfig cacheConfig, CacheSql cacheSql) {
+    public static void updateKeys(CacheConfig cacheConfig, CacheSql cacheSql) {
         if (cacheConfig == null) {
             return;
         }
@@ -36,7 +36,7 @@ public class CacheHandler {
         return null;
     }
 
-    private static String encoding(String s) {
+    private static String md5Encoding(String s) {
         try {
             byte[] e = s.getBytes();
             MessageDigest mdInst = MessageDigest.getInstance("md5");
@@ -69,7 +69,7 @@ public class CacheHandler {
                     version = System.currentTimeMillis() + "";
                     cacheConfig.getCacheClient().set(key.getBytes(), 0, version.getBytes());
                 }
-                cacheConfig.getCacheClient().set((key + ":" + version + ":" + encoding(cacheSql.getSql())).getBytes(), cacheConfig.getExpireTime(), ProtostuffUtils.serialize(object));
+                cacheConfig.getCacheClient().set((key + ":" + version + ":" + md5Encoding(cacheSql.getSql())).getBytes(), cacheConfig.getExpireTime(), ProtostuffUtils.serialize(object));
             }
         }
         return null;

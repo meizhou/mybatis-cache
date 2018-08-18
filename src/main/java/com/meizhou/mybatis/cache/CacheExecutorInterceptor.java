@@ -90,7 +90,7 @@ public class CacheExecutorInterceptor implements Interceptor {
         }
         if (invocation.getMethod().getName().equals("update")) {
             result = invocation.proceed();
-            CacheHandler.getUpdateKey(cacheConfig, cacheSql);
+            CacheHandler.updateKeys(cacheConfig, cacheSql);
             return result;
         }
         return null;
