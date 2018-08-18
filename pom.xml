@@ -6,10 +6,12 @@
     <artifactId>mybatis-cache</artifactId>
     <packaging>jar</packaging>
     <version>0.1.0</version>
+
     <properties>
         <mybatis.version>3.2.8</mybatis.version>
         <maven.compiler.version>3.0</maven.compiler.version>
         <druid.version>1.1.10</druid.version>
+        <io.protostuff.version>1.5.2</io.protostuff.version>
     </properties>
     <dependencies>
         <dependency>
@@ -21,6 +23,16 @@
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
             <version>${mybatis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.protostuff</groupId>
+            <artifactId>protostuff-core</artifactId>
+            <version>${io.protostuff.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.protostuff</groupId>
+            <artifactId>protostuff-runtime</artifactId>
+            <version>${io.protostuff.version}</version>
         </dependency>
     </dependencies>
     <build>
