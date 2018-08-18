@@ -88,6 +88,7 @@ public class CacheExecutorInterceptor implements Interceptor {
             }
             return result;
         }
+        return null;
     }
 
     @Override
