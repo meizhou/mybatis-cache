@@ -14,9 +14,19 @@ public class CacheConfig {
 
     private boolean isCache;
 
+    private String version;
+
     private ICacheClient cacheClient;
 
-    private String version;
+    private ICacheHandler cacheHandler;
+
+    public ICacheHandler getCacheHandler() {
+        return cacheHandler;
+    }
+
+    public void setCacheHandler(ICacheHandler cacheHandler) {
+        this.cacheHandler = cacheHandler;
+    }
 
     public List<String> getCacheKeys() {
         return cacheKeys;

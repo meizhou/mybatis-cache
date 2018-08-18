@@ -23,6 +23,7 @@ public class CacheExecutorInterceptor implements Interceptor {
 
     static {
         CacheConfig cacheConfig = new CacheConfig();
+        cacheConfig.setCacheHandler(new CommonCacheHandler());
         ICacheClient cacheClient = new RedisCacheClient("127.0.0.1", 6379, "123456");
         cacheConfig.setCacheClient(cacheClient);
         cacheConfig.setTableName("shop");
@@ -67,22 +68,26 @@ public class CacheExecutorInterceptor implements Interceptor {
         List<Object> objectList = genParameterObjectList(mappedStatement, boundSql);
         CacheSql cacheSql = CacheSql.buildCacheSql(boundSql.getSql(), objectList);
         CacheConfig cacheConfig = cacheConfigMap.get(cacheSql.getTable());
-        Object result = null;
         if (invocation.getMethod().getName().equals("query")) {
-            result = CacheHandler.getObject(cacheConfig, cacheSql);
-            if (result != null) {
-                return result;
+            if (cacheConfig != null) {
+                Object result = cacheConfig.getCacheHandler().getObject(cacheConfig, cacheSql);
+                if (result != null) {
+                    return result;
+                }
             }
-            result = invocation.proceed();
-            CacheHandler.setObject(cacheConfig, cacheSql, result);
+            Object result = invocation.proceed();
+            if (cacheConfig != null) {
+                cacheConfig.getCacheHandler().setObject(cacheConfig, cacheSql, result);
+            }
             return result;
         }
         if (invocation.getMethod().getName().equals("update")) {
-            result = invocation.proceed();
-            CacheHandler.updateKeys(cacheConfig, cacheSql);
+            Object result = invocation.proceed();
+            if (cacheConfig != null) {
+                cacheConfig.getCacheHandler().updateKeys(cacheConfig, cacheSql);
+            }
             return result;
         }
-        return null;
     }
 
     @Override

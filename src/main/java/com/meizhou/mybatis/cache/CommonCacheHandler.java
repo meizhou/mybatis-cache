@@ -2,9 +2,10 @@ package com.meizhou.mybatis.cache;
 
 import java.security.MessageDigest;
 
-public class CacheHandler {
+public class CommonCacheHandler implements ICacheHandler {
 
-    public static void updateKeys(CacheConfig cacheConfig, CacheSql cacheSql) {
+    @Override
+    public void updateKeys(CacheConfig cacheConfig, CacheSql cacheSql) {
         if (cacheConfig == null) {
             return;
         }
@@ -15,7 +16,8 @@ public class CacheHandler {
         }
     }
 
-    public static Object getObject(CacheConfig cacheConfig, CacheSql cacheSql) {
+    @Override
+    public Object getObject(CacheConfig cacheConfig, CacheSql cacheSql) {
         if (cacheConfig == null) {
             return null;
         }
@@ -38,9 +40,10 @@ public class CacheHandler {
     }
 
 
-    public static Object setObject(CacheConfig cacheConfig, CacheSql cacheSql, Object object) {
+    @Override
+    public void setObject(CacheConfig cacheConfig, CacheSql cacheSql, Object object) {
         if (cacheConfig == null) {
-            return null;
+            return;
         }
         for (String cacheKey : cacheConfig.getCacheKeys()) {
             Object value = cacheSql.getParameterMap().get(cacheKey);
@@ -55,7 +58,6 @@ public class CacheHandler {
                 break;
             }
         }
-        return null;
     }
 
     private static String md5Encoding(String s) {
