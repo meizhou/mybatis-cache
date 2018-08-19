@@ -96,6 +96,7 @@ public class CacheExecutorInterceptor implements Interceptor {
         String classType = properties.getProperty("cacheExecutorConfig");
         try {
             this.abstractCacheExecutorConfig = (AbstractCacheExecutorConfig) Class.forName(classType).newInstance();
+            this.abstractCacheExecutorConfig.init();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
