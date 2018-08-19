@@ -21,8 +21,8 @@ public class RedisCacheClient implements ICacheClient {
 
     @Override
     public byte[] get(byte[] key) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("RedisCacheClient get==>" + new String(key));
+        if (logger.isDebugEnabled()) {
+            logger.debug("RedisCacheClient get==>" + new String(key));
         }
         Jedis shardedJedis = null;
         try {
@@ -40,8 +40,8 @@ public class RedisCacheClient implements ICacheClient {
 
     @Override
     public Boolean set(byte[] key, int exp, byte[] value) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("RedisCacheClient set==>" + new String(key));
+        if (logger.isDebugEnabled()) {
+            logger.debug("RedisCacheClient set==>" + new String(key));
         }
         Jedis jedis = null;
         try {
