@@ -1,5 +1,7 @@
 package com.meizhou.mybatis.cache;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -9,6 +11,8 @@ import redis.clients.jedis.JedisPoolConfig;
  */
 public class RedisCacheClient implements ICacheClient {
 
+    Logger logger = LoggerFactory.getLogger(RedisCacheClient.class);
+
     private JedisPool pool;
 
     public RedisCacheClient(String host, Integer port, String password) {
@@ -17,11 +21,15 @@ public class RedisCacheClient implements ICacheClient {
 
     @Override
     public byte[] get(byte[] key) {
+        if (logger.isTraceEnabled()) {
+            logger.trace("RedisCacheClient get==>" + new String(key));
+        }
         Jedis shardedJedis = null;
         try {
             shardedJedis = pool.getResource();
             return shardedJedis.get(key);
         } catch (Exception e) {
+            logger.error(e.getMessage(), e);
             return null;
         } finally {
             if (shardedJedis != null) {
@@ -32,12 +40,16 @@ public class RedisCacheClient implements ICacheClient {
 
     @Override
     public Boolean set(byte[] key, int exp, byte[] value) {
+        if (logger.isTraceEnabled()) {
+            logger.trace("RedisCacheClient set==>" + new String(key));
+        }
         Jedis jedis = null;
         try {
             jedis = pool.getResource();
             jedis.setex(key, exp, value);
             return true;
         } catch (Exception e) {
+            logger.error(e.getMessage(), e);
             return false;
         } finally {
             if (jedis != null) {

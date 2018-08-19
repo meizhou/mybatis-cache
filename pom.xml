@@ -13,8 +13,14 @@
         <io.protostuff.prefix>1.5.2</io.protostuff.prefix>
         <jedis.prefix>2.8.1</jedis.prefix>
         <aspectjweaver.version>1.8.1</aspectjweaver.version>
+        <slf4j.version>1.7.7</slf4j.version>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
@@ -60,5 +66,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
