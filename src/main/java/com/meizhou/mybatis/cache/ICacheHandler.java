@@ -5,12 +5,10 @@ package com.meizhou.mybatis.cache;
  */
 public interface ICacheHandler {
 
-    void updateKeys(CacheConfig cacheConfig, CacheSql cacheSql);
+    void updateKeys(CacheTableConfig cacheTableConfig, CacheSql cacheSql);
 
-    Object getObject(CacheConfig cacheConfig, CacheSql cacheSql);
+    Object getObject(CacheTableConfig cacheTableConfig, CacheSql cacheSql);
 
-    void setObject(CacheConfig cacheConfig, CacheSql cacheSql, Object object);
-
-
+    void setObject(CacheTableConfig cacheTableConfig, CacheSql cacheSql, Object object);
 
 }

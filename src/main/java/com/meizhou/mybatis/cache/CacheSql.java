@@ -4,7 +4,6 @@ import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.visitor.SchemaStatVisitor;
 import com.alibaba.druid.stat.TableStat;
-import com.alibaba.druid.util.JdbcConstants;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,11 +20,11 @@ public class CacheSql {
 
     private Map<String, Object> parameterMap;
 
-    public static CacheSql buildCacheSql(String originSql, List<Object> objectList) {
+    public static CacheSql buildCacheSql(String originSql, List<Object> objectList, String dbType) {
         CacheSql cacheSql = new CacheSql();
-        String sql = SQLUtils.format(originSql, JdbcConstants.MYSQL, objectList);
-        List<SQLStatement> stmtList = SQLUtils.parseStatements(sql, JdbcConstants.MYSQL);
-        SchemaStatVisitor statVisitor = SQLUtils.createSchemaStatVisitor(JdbcConstants.MYSQL);
+        String sql = SQLUtils.format(originSql, dbType, objectList);
+        List<SQLStatement> stmtList = SQLUtils.parseStatements(sql, dbType);
+        SchemaStatVisitor statVisitor = SQLUtils.createSchemaStatVisitor(dbType);
         for (SQLStatement stmt : stmtList) {
             stmt.accept(statVisitor);
         }

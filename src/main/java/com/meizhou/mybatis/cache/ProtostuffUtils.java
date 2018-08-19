@@ -58,8 +58,8 @@ public class ProtostuffUtils {
     }
 
     public static void main(String[] args) {
-        byte[] a = serialize(new CacheConfig());
-        System.out.println(deserialize(a, CacheConfig.class));
+        byte[] a = serialize(new CacheTableConfig());
+        System.out.println(deserialize(a, CacheTableConfig.class));
     }
 
 

@@ -8,29 +8,29 @@ import java.security.MessageDigest;
 public class CommonCacheHandler implements ICacheHandler {
 
     @Override
-    public void updateKeys(CacheConfig cacheConfig, CacheSql cacheSql) {
-        if (cacheConfig == null) {
+    public void updateKeys(CacheTableConfig cacheTableConfig, CacheSql cacheSql) {
+        if (cacheTableConfig == null) {
             return;
         }
-        for (String cacheKey : cacheConfig.getCacheKeys()) {
+        for (String cacheKey : cacheTableConfig.getCacheKeys()) {
             Object value = cacheSql.getParameterMap().get(cacheKey);
-            String versionKey = cacheConfig.getPrefix() + "." + cacheSql.getTable() + "." + cacheKey + ":" + value;
-            cacheConfig.getCacheClient().set(versionKey.getBytes(), 30 * 3600 * 24, (System.currentTimeMillis() + "").getBytes());
+            String versionKey = cacheTableConfig.getPrefix() + "." + cacheSql.getTable() + "." + cacheKey + ":" + value;
+            cacheTableConfig.getCacheClient().set(versionKey.getBytes(), 30 * 3600 * 24, (System.currentTimeMillis() + "").getBytes());
         }
     }
 
     @Override
-    public Object getObject(CacheConfig cacheConfig, CacheSql cacheSql) {
-        if (cacheConfig == null) {
+    public Object getObject(CacheTableConfig cacheTableConfig, CacheSql cacheSql) {
+        if (cacheTableConfig == null) {
             return null;
         }
-        for (String cacheKey : cacheConfig.getCacheKeys()) {
+        for (String cacheKey : cacheTableConfig.getCacheKeys()) {
             Object value = cacheSql.getParameterMap().get(cacheKey);
             if (value != null) {
-                String versionKey = cacheConfig.getPrefix() + "." + cacheSql.getTable() + "." + cacheKey + ":" + value;
-                byte[] version = cacheConfig.getCacheClient().get(versionKey.getBytes());
+                String versionKey = cacheTableConfig.getPrefix() + "." + cacheSql.getTable() + "." + cacheKey + ":" + value;
+                byte[] version = cacheTableConfig.getCacheClient().get(versionKey.getBytes());
                 if (version != null && version.length > 0) {
-                    byte[] bytes = cacheConfig.getCacheClient().get((versionKey + ":" + new String(version) + "." + md5Encoding(cacheSql.getSql())).getBytes());
+                    byte[] bytes = cacheTableConfig.getCacheClient().get((versionKey + ":" + new String(version) + "." + md5Encoding(cacheSql.getSql())).getBytes());
                     if (bytes != null && bytes.length > 0) {
                         CacheResult response = ProtostuffUtils.deserialize(bytes, CacheResult.class);
                         return response.getObject();
@@ -44,20 +44,20 @@ public class CommonCacheHandler implements ICacheHandler {
 
 
     @Override
-    public void setObject(CacheConfig cacheConfig, CacheSql cacheSql, Object object) {
-        if (cacheConfig == null) {
+    public void setObject(CacheTableConfig cacheTableConfig, CacheSql cacheSql, Object object) {
+        if (cacheTableConfig == null) {
             return;
         }
-        for (String cacheKey : cacheConfig.getCacheKeys()) {
+        for (String cacheKey : cacheTableConfig.getCacheKeys()) {
             Object value = cacheSql.getParameterMap().get(cacheKey);
             if (value != null) {
-                String versionKey = cacheConfig.getPrefix() + "." + cacheSql.getTable() + "." + cacheKey + ":" + value;
-                byte[] version = cacheConfig.getCacheClient().get(versionKey.getBytes());
+                String versionKey = cacheTableConfig.getPrefix() + "." + cacheSql.getTable() + "." + cacheKey + ":" + value;
+                byte[] version = cacheTableConfig.getCacheClient().get(versionKey.getBytes());
                 if (version == null || version.length == 0) {
                     version = (System.currentTimeMillis() + "").getBytes();
-                    cacheConfig.getCacheClient().set(versionKey.getBytes(), 30 * 3600 * 24, version);
+                    cacheTableConfig.getCacheClient().set(versionKey.getBytes(), 30 * 3600 * 24, version);
                 }
-                cacheConfig.getCacheClient().set((versionKey + ":" + new String(version) + "." + md5Encoding(cacheSql.getSql())).getBytes(), cacheConfig.getExpireTime(), ProtostuffUtils.serialize(new CacheResult(object)));
+                cacheTableConfig.getCacheClient().set((versionKey + ":" + new String(version) + "." + md5Encoding(cacheSql.getSql())).getBytes(), cacheTableConfig.getExpireTime(), ProtostuffUtils.serialize(new CacheResult(object)));
                 break;
             }
         }

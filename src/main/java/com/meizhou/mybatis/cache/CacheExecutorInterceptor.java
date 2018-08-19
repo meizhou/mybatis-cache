@@ -9,6 +9,8 @@ import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -19,20 +21,11 @@ import java.util.*;
         @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class})})
 public class CacheExecutorInterceptor implements Interceptor {
 
-    private static Map<String, CacheConfig> cacheConfigMap = new HashMap<>();
+    Logger logger = LoggerFactory.getLogger(CacheExecutorInterceptor.class);
 
-    static {
-        CacheConfig cacheConfig = new CacheConfig();
-        cacheConfig.setCacheHandler(new CommonCacheHandler());
-        ICacheClient cacheClient = new RedisCacheClient("127.0.0.1", 6379, "123456");
-        cacheConfig.setCacheClient(cacheClient);
-        cacheConfig.setTableName("shop");
-        cacheConfig.setCacheKeys(Arrays.asList("id"));
-        cacheConfig.setPrefix("v20");
-        cacheConfig.setIsCache(true);
-        cacheConfig.setExpireTime(7 * 3600 * 24);
-        cacheConfigMap.put("shop", cacheConfig);
-    }
+    private String dbType;
+
+    private AbstractCacheExecutorConfig abstractCacheExecutorConfig;
 
     private List<Object> genParameterObjectList(MappedStatement mappedStatement, BoundSql boundSql) {
         Object parameterObject = boundSql.getParameterObject();
@@ -67,25 +60,25 @@ public class CacheExecutorInterceptor implements Interceptor {
         MappedStatement mappedStatement = (MappedStatement) invocation.getArgs()[0];
         BoundSql boundSql = mappedStatement.getBoundSql(invocation.getArgs()[1]);
         List<Object> objectList = genParameterObjectList(mappedStatement, boundSql);
-        CacheSql cacheSql = CacheSql.buildCacheSql(boundSql.getSql(), objectList);
-        CacheConfig cacheConfig = cacheConfigMap.get(cacheSql.getTable());
+        CacheSql cacheSql = CacheSql.buildCacheSql(boundSql.getSql(), objectList, dbType);
+        CacheTableConfig cacheTableConfig = abstractCacheExecutorConfig.getCacheTableConfigByTable(cacheSql.getTable());
         if (invocation.getMethod().getName().equals("query")) {
-            if (cacheConfig != null && cacheConfig.getIsCache() && !CacheIgnoreThreadLocal.get()) {
-                Object result = cacheConfig.getCacheHandler().getObject(cacheConfig, cacheSql);
+            if (cacheTableConfig != null && cacheTableConfig.getIsCache() && !CacheIgnoreThreadLocal.get()) {
+                Object result = cacheTableConfig.getCacheHandler().getObject(cacheTableConfig, cacheSql);
                 if (result != null) {
                     return result;
                 }
             }
             Object result = invocation.proceed();
-            if (cacheConfig != null && cacheConfig.getIsCache() && !CacheIgnoreThreadLocal.get()) {
-                cacheConfig.getCacheHandler().setObject(cacheConfig, cacheSql, result);
+            if (cacheTableConfig != null && cacheTableConfig.getIsCache() && !CacheIgnoreThreadLocal.get()) {
+                cacheTableConfig.getCacheHandler().setObject(cacheTableConfig, cacheSql, result);
             }
             return result;
         }
         if (invocation.getMethod().getName().equals("update")) {
             Object result = invocation.proceed();
-            if (cacheConfig != null && cacheConfig.getIsCache()) {
-                cacheConfig.getCacheHandler().updateKeys(cacheConfig, cacheSql);
+            if (cacheTableConfig != null && cacheTableConfig.getIsCache()) {
+                cacheTableConfig.getCacheHandler().updateKeys(cacheTableConfig, cacheSql);
             }
             return result;
         }
@@ -99,6 +92,12 @@ public class CacheExecutorInterceptor implements Interceptor {
 
     @Override
     public void setProperties(Properties properties) {
-
+        this.dbType = properties.getProperty("dbType", "mysql");
+        String classType = properties.getProperty("cacheExecutorConfig");
+        try {
+            this.abstractCacheExecutorConfig = (AbstractCacheExecutorConfig) Class.forName(classType).newInstance();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 }
