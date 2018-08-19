@@ -1,5 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+﻿<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.meizhou</groupId>
@@ -8,37 +7,43 @@
     <version>0.1.0</version>
 
     <properties>
-        <mybatis.version>3.2.8</mybatis.version>
-        <maven.compiler.version>3.0</maven.compiler.version>
-        <druid.version>1.1.10</druid.version>
-        <io.protostuff.version>1.5.2</io.protostuff.version>
-        <jedis.version>2.8.1</jedis.version>
+        <mybatis.prefix>3.2.8</mybatis.prefix>
+        <maven.compiler.prefix>3.0</maven.compiler.prefix>
+        <druid.prefix>1.1.10</druid.prefix>
+        <io.protostuff.prefix>1.5.2</io.protostuff.prefix>
+        <jedis.prefix>2.8.1</jedis.prefix>
+        <aspectjweaver.version>1.8.1</aspectjweaver.version>
     </properties>
     <dependencies>
         <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>${aspectjweaver.version}</version>
+        </dependency>
+        <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-            <version>${jedis.version}</version>
+            <version>${jedis.prefix}</version>
         </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
-            <version>${druid.version}</version>
+            <version>${druid.prefix}</version>
         </dependency>
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
-            <version>${mybatis.version}</version>
+            <version>${mybatis.prefix}</version>
         </dependency>
         <dependency>
             <groupId>io.protostuff</groupId>
             <artifactId>protostuff-core</artifactId>
-            <version>${io.protostuff.version}</version>
+            <version>${io.protostuff.prefix}</version>
         </dependency>
         <dependency>
             <groupId>io.protostuff</groupId>
             <artifactId>protostuff-runtime</artifactId>
-            <version>${io.protostuff.version}</version>
+            <version>${io.protostuff.prefix}</version>
         </dependency>
     </dependencies>
     <build>
@@ -46,7 +51,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.version}</version>
+                <version>${maven.compiler.prefix}</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>

@@ -28,7 +28,8 @@ public class CacheExecutorInterceptor implements Interceptor {
         cacheConfig.setCacheClient(cacheClient);
         cacheConfig.setTableName("shop");
         cacheConfig.setCacheKeys(Arrays.asList("id"));
-        cacheConfig.setVersion("v20");
+        cacheConfig.setPrefix("v20");
+        cacheConfig.setIsCache(true);
         cacheConfig.setExpireTime(7 * 3600 * 24);
         cacheConfigMap.put("shop", cacheConfig);
     }
@@ -69,21 +70,21 @@ public class CacheExecutorInterceptor implements Interceptor {
         CacheSql cacheSql = CacheSql.buildCacheSql(boundSql.getSql(), objectList);
         CacheConfig cacheConfig = cacheConfigMap.get(cacheSql.getTable());
         if (invocation.getMethod().getName().equals("query")) {
-            if (cacheConfig != null) {
+            if (cacheConfig != null && cacheConfig.getIsCache() && !CacheIgnoreThreadLocal.get()) {
                 Object result = cacheConfig.getCacheHandler().getObject(cacheConfig, cacheSql);
                 if (result != null) {
                     return result;
                 }
             }
             Object result = invocation.proceed();
-            if (cacheConfig != null) {
+            if (cacheConfig != null && cacheConfig.getIsCache() && !CacheIgnoreThreadLocal.get()) {
                 cacheConfig.getCacheHandler().setObject(cacheConfig, cacheSql, result);
             }
             return result;
         }
         if (invocation.getMethod().getName().equals("update")) {
             Object result = invocation.proceed();
-            if (cacheConfig != null) {
+            if (cacheConfig != null && cacheConfig.getIsCache()) {
                 cacheConfig.getCacheHandler().updateKeys(cacheConfig, cacheSql);
             }
             return result;

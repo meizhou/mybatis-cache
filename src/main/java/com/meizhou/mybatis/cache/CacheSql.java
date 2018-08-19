@@ -10,6 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Created by meizhou on 2018/8/18.
+ */
 public class CacheSql {
 
     private String sql;

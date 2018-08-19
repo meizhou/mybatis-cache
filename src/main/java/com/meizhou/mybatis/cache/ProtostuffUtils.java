@@ -8,10 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 序列化工具类（基于 Protostuff 实现）
- *
- * @author huangyong
- * @since 1.0.0
+ * Created by meizhou on 2018/8/18.
  */
 public class ProtostuffUtils {
 

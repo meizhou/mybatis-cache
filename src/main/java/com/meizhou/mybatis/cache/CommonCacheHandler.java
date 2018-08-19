@@ -2,6 +2,9 @@ package com.meizhou.mybatis.cache;
 
 import java.security.MessageDigest;
 
+/**
+ * Created by meizhou on 2018/8/18.
+ */
 public class CommonCacheHandler implements ICacheHandler {
 
     @Override
@@ -11,8 +14,8 @@ public class CommonCacheHandler implements ICacheHandler {
         }
         for (String cacheKey : cacheConfig.getCacheKeys()) {
             Object value = cacheSql.getParameterMap().get(cacheKey);
-            String key = cacheConfig.getVersion() + "." + cacheSql.getTable() + "." + cacheKey + ":" + value;
-            cacheConfig.getCacheClient().set(key.getBytes(), 30 * 3600 * 24, (System.currentTimeMillis() + "").getBytes());
+            String versionKey = cacheConfig.getPrefix() + "." + cacheSql.getTable() + "." + cacheKey + ":" + value;
+            cacheConfig.getCacheClient().set(versionKey.getBytes(), 30 * 3600 * 24, (System.currentTimeMillis() + "").getBytes());
         }
     }
 
@@ -24,10 +27,10 @@ public class CommonCacheHandler implements ICacheHandler {
         for (String cacheKey : cacheConfig.getCacheKeys()) {
             Object value = cacheSql.getParameterMap().get(cacheKey);
             if (value != null) {
-                String key = cacheConfig.getVersion() + "." + cacheSql.getTable() + "." + cacheKey + ":" + value;
-                byte[] version = cacheConfig.getCacheClient().get(key.getBytes());
+                String versionKey = cacheConfig.getPrefix() + "." + cacheSql.getTable() + "." + cacheKey + ":" + value;
+                byte[] version = cacheConfig.getCacheClient().get(versionKey.getBytes());
                 if (version != null && version.length > 0) {
-                    byte[] bytes = cacheConfig.getCacheClient().get((key + ":" + new String(version) + ":" + md5Encoding(cacheSql.getSql())).getBytes());
+                    byte[] bytes = cacheConfig.getCacheClient().get((versionKey + ":" + new String(version) + "." + md5Encoding(cacheSql.getSql())).getBytes());
                     if (bytes != null && bytes.length > 0) {
                         CacheResult response = ProtostuffUtils.deserialize(bytes, CacheResult.class);
                         return response.getObject();
@@ -48,13 +51,13 @@ public class CommonCacheHandler implements ICacheHandler {
         for (String cacheKey : cacheConfig.getCacheKeys()) {
             Object value = cacheSql.getParameterMap().get(cacheKey);
             if (value != null) {
-                String key = cacheConfig.getVersion() + "." + cacheSql.getTable() + "." + cacheKey + ":" + value;
-                byte[] version = cacheConfig.getCacheClient().get(key.getBytes());
+                String versionKey = cacheConfig.getPrefix() + "." + cacheSql.getTable() + "." + cacheKey + ":" + value;
+                byte[] version = cacheConfig.getCacheClient().get(versionKey.getBytes());
                 if (version == null || version.length == 0) {
                     version = (System.currentTimeMillis() + "").getBytes();
-                    cacheConfig.getCacheClient().set(key.getBytes(), 30 * 3600 * 24, version);
+                    cacheConfig.getCacheClient().set(versionKey.getBytes(), 30 * 3600 * 24, version);
                 }
-                cacheConfig.getCacheClient().set((key + ":" + new String(version) + ":" + md5Encoding(cacheSql.getSql())).getBytes(), cacheConfig.getExpireTime(), ProtostuffUtils.serialize(new CacheResult(object)));
+                cacheConfig.getCacheClient().set((versionKey + ":" + new String(version) + "." + md5Encoding(cacheSql.getSql())).getBytes(), cacheConfig.getExpireTime(), ProtostuffUtils.serialize(new CacheResult(object)));
                 break;
             }
         }

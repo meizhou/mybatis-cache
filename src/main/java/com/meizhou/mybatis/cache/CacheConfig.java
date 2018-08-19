@@ -2,6 +2,9 @@ package com.meizhou.mybatis.cache;
 
 import java.util.List;
 
+/**
+ * Created by meizhou on 2018/8/18.
+ */
 public class CacheConfig {
 
     private List<String> cacheKeys;
@@ -14,7 +17,7 @@ public class CacheConfig {
 
     private boolean isCache;
 
-    private String version;
+    private String prefix;
 
     private ICacheClient cacheClient;
 
@@ -76,11 +79,11 @@ public class CacheConfig {
         this.cacheClient = cacheClient;
     }
 
-    public String getVersion() {
-        return version;
+    public String getPrefix() {
+        return prefix;
     }
 
-    public void setVersion(String version) {
-        this.version = version;
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
     }
 }

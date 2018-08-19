@@ -4,6 +4,9 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
+/**
+ * Created by meizhou on 2018/8/18.
+ */
 public class RedisCacheClient implements ICacheClient {
 
     private JedisPool pool;
