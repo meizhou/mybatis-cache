@@ -22,6 +22,17 @@ public class CacheSql {
 
     private Map<String, Object> parameterMap;
 
+    private static boolean isAvailableObject(Object object) {
+        if (object == null) {
+            return false;
+        } else if (object instanceof Number && String.valueOf(object).equals("0")) {
+            return false;
+        } else if (object instanceof String && String.valueOf(object).trim().length() == 0) {
+            return false;
+        }
+        return true;
+    }
+
     public static CacheSql buildCacheSql(String originSql, List<Object> objectList, String dbType) {
         CacheSql cacheSql = new CacheSql();
         String sql = SQLUtils.format(originSql, dbType, objectList);
@@ -39,7 +50,10 @@ public class CacheSql {
                 ParameterizedOutputVisitorUtils.parameterize(sql, dbType, values);
                 int i = 0;
                 for (TableStat.Column column : statVisitor.getColumns()) {
-                    parameterMap.put(column.getName(), values.get(i));
+                    Object object = values.get(i);
+                    if (isAvailableObject(object)) {
+                        parameterMap.put(column.getName(), object);
+                    }
                     i++;
                 }
             }
@@ -48,7 +62,10 @@ public class CacheSql {
         //取出来where条件
         for (TableStat.Condition entry : statVisitor.getConditions()) {
             if (entry.getOperator().equals("=")) {
-                parameterMap.put(entry.getColumn().getName().replaceAll("`", ""), entry.getValues().get(0));
+                Object object = entry.getValues().get(0);
+                if (isAvailableObject(object)) {
+                    parameterMap.put(entry.getColumn().getName().replaceAll("`", ""), object);
+                }
             }
         }
         cacheSql.setParameterMap(parameterMap);
