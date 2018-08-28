@@ -23,6 +23,8 @@ public class CacheTableConfig {
 
     private ICacheHandler cacheHandler;
 
+    private Boolean isSkipInsertException = true;
+
     public static CacheTableConfig build(String prefix, String tableName, List<String> cacheKeys, ICacheClient cacheClient) {
         CacheTableConfig cacheTableConfig = new CacheTableConfig();
         cacheTableConfig.setPrefix(prefix);
@@ -32,7 +34,16 @@ public class CacheTableConfig {
         cacheTableConfig.setCacheHandler(new CommonCacheHandler());
         cacheTableConfig.setIsCache(true);
         cacheTableConfig.setExpireTime(7 * 3600 * 24);
+        cacheTableConfig.setIsSkipInsertException(true);
         return cacheTableConfig;
+    }
+
+    public Boolean getIsSkipInsertException() {
+        return isSkipInsertException;
+    }
+
+    public void setIsSkipInsertException(Boolean isSkipInsertException) {
+        this.isSkipInsertException = isSkipInsertException;
     }
 
     public String getPrefix() {

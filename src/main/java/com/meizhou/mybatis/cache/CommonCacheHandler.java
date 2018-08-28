@@ -15,6 +15,9 @@ public class CommonCacheHandler implements ICacheHandler {
         for (String cacheKey : cacheTableConfig.getCacheKeys()) {
             Object value = cacheSql.getParameterMap().get(cacheKey);
             if (value == null) {
+                if (cacheSql.getIsInsert() && cacheTableConfig.getIsSkipInsertException()) {
+                    continue;
+                }
                 throw new RuntimeException("cache key must value ！！！");
             }
             String versionKey = cacheTableConfig.getPrefix() + "." + cacheSql.getTable() + "." + cacheKey + ":" + value;

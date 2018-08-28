@@ -20,6 +20,8 @@ public class CacheSql {
 
     private String table;
 
+    private Boolean isInsert;
+
     private Map<String, Object> parameterMap;
 
     private static boolean isAvailableObject(Object object) {
@@ -46,6 +48,7 @@ public class CacheSql {
             cacheSql.setTable(entry.getKey().getName());
             //当为insert语句的时候
             if (entry.getValue().getInsertCount() > 0) {
+                cacheSql.setIsInsert(true);
                 List<Object> values = new ArrayList<>();
                 ParameterizedOutputVisitorUtils.parameterize(sql, dbType, values);
                 int i = 0;
@@ -56,6 +59,8 @@ public class CacheSql {
                     }
                     i++;
                 }
+            } else {
+                cacheSql.setIsInsert(false);
             }
             break;
         }
@@ -95,6 +100,14 @@ public class CacheSql {
 
     public void setParameterMap(Map<String, Object> parameterMap) {
         this.parameterMap = parameterMap;
+    }
+
+    public Boolean getIsInsert() {
+        return isInsert;
+    }
+
+    public void setIsInsert(Boolean isInsert) {
+        this.isInsert = isInsert;
     }
 
     @Override
