@@ -18,7 +18,7 @@ public class CommonCacheHandler implements ICacheHandler {
                 throw new RuntimeException("cache key must value ！！！");
             }
             String versionKey = cacheTableConfig.getPrefix() + "." + cacheSql.getTable() + "." + cacheKey + ":" + value;
-            cacheTableConfig.getCacheClient().set(versionKey.getBytes(), 30 * 3600 * 24, (System.currentTimeMillis() + "").getBytes());
+            cacheTableConfig.getCacheClient().set(versionKey.getBytes(), 15 * 3600 * 24, (System.currentTimeMillis() + "").getBytes());
         }
     }
 
@@ -58,7 +58,7 @@ public class CommonCacheHandler implements ICacheHandler {
                 byte[] version = cacheTableConfig.getCacheClient().get(versionKey.getBytes());
                 if (version == null || version.length == 0) {
                     version = (System.currentTimeMillis() + "").getBytes();
-                    cacheTableConfig.getCacheClient().set(versionKey.getBytes(), 30 * 3600 * 24, version);
+                    cacheTableConfig.getCacheClient().set(versionKey.getBytes(), 15 * 3600 * 24, version);
                 }
                 cacheTableConfig.getCacheClient().set((versionKey + ":" + new String(version) + "." + md5Encoding(cacheSql.getSql())).getBytes(), cacheTableConfig.getExpireTime(), ProtostuffUtils.serialize(new CacheResult(object)));
                 break;
