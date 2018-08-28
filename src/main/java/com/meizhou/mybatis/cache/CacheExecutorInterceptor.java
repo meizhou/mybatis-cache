@@ -25,6 +25,8 @@ public class CacheExecutorInterceptor implements Interceptor {
 
     private String dbType;
 
+    private Boolean isCache;
+
     private AbstractCacheExecutorConfig abstractCacheExecutorConfig;
 
     private List<Object> genParameterObjectList(MappedStatement mappedStatement, BoundSql boundSql) {
@@ -63,21 +65,21 @@ public class CacheExecutorInterceptor implements Interceptor {
         CacheSql cacheSql = CacheSql.buildCacheSql(boundSql.getSql(), objectList, dbType);
         CacheTableConfig cacheTableConfig = abstractCacheExecutorConfig.getCacheTableConfigByTable(cacheSql.getTable());
         if (invocation.getMethod().getName().equals("query")) {
-            if (cacheTableConfig != null && cacheTableConfig.getIsCache() && !CacheIgnoreThreadLocal.get()) {
+            if (isCache && cacheTableConfig != null && cacheTableConfig.getIsCache() && !CacheIgnoreThreadLocal.get()) {
                 Object result = cacheTableConfig.getCacheHandler().getObject(cacheTableConfig, cacheSql);
                 if (result != null) {
                     return result;
                 }
             }
             Object result = invocation.proceed();
-            if (cacheTableConfig != null && cacheTableConfig.getIsCache() && !CacheIgnoreThreadLocal.get()) {
+            if (isCache && cacheTableConfig != null && cacheTableConfig.getIsCache() && !CacheIgnoreThreadLocal.get()) {
                 cacheTableConfig.getCacheHandler().setObject(cacheTableConfig, cacheSql, result);
             }
             return result;
         }
         if (invocation.getMethod().getName().equals("update")) {
             Object result = invocation.proceed();
-            if (cacheTableConfig != null && cacheTableConfig.getIsCache()) {
+            if (isCache && cacheTableConfig != null && cacheTableConfig.getIsCache()) {
                 cacheTableConfig.getCacheHandler().updateKeys(cacheTableConfig, cacheSql);
             }
             return result;
@@ -93,6 +95,7 @@ public class CacheExecutorInterceptor implements Interceptor {
     @Override
     public void setProperties(Properties properties) {
         this.dbType = properties.getProperty("dbType", "mysql");
+        this.isCache = Boolean.parseBoolean(properties.getProperty("isCache", "true"));
         String classType = properties.getProperty("cacheExecutorConfig");
         try {
             this.abstractCacheExecutorConfig = (AbstractCacheExecutorConfig) Class.forName(classType).newInstance();
