@@ -55,7 +55,7 @@ public class CacheSql {
                 for (TableStat.Column column : statVisitor.getColumns()) {
                     Object object = values.get(i);
                     if (isAvailableObject(object)) {
-                        parameterMap.put(column.getName(), object);
+                        parameterMap.put(column.getName().replaceAll("`", ""), object);
                     }
                     i++;
                 }
