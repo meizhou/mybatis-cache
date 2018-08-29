@@ -46,9 +46,8 @@ public class CacheSql {
         Map<String, Object> parameterMap = new HashMap<String, Object>();
         for (Map.Entry<TableStat.Name, TableStat> entry : statVisitor.getTables().entrySet()) {
             cacheSql.setTable(entry.getKey().getName());
-            //当为insert语句的时候
+            //当为insert语句的时候  || entry.getValue().getUpdateCount() > 0
             if (entry.getValue().getInsertCount() > 0) {
-                cacheSql.setIsInsert(true);
                 List<Object> values = new ArrayList<>();
                 ParameterizedOutputVisitorUtils.parameterize(sql, dbType, values);
                 int i = 0;
@@ -59,9 +58,8 @@ public class CacheSql {
                     }
                     i++;
                 }
-            } else {
-                cacheSql.setIsInsert(false);
             }
+            cacheSql.setIsInsert(entry.getValue().getInsertCount() > 0);
             break;
         }
         //取出来where条件
@@ -113,7 +111,7 @@ public class CacheSql {
     @Override
     public String toString() {
         return "CacheSql{" +
-                "sql='" + sql.replaceAll("\n","") + '\'' +
+                "sql='" + sql.replaceAll("\n", " ") + '\'' +
                 ", table='" + table + '\'' +
                 ", parameterMap=" + parameterMap +
                 '}';
