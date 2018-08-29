@@ -1,10 +1,7 @@
 package com.meizhou.mybatis.cache;
 
 import org.apache.ibatis.executor.Executor;
-import org.apache.ibatis.mapping.BoundSql;
-import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.mapping.ParameterMapping;
-import org.apache.ibatis.mapping.ParameterMode;
+import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.ResultHandler;
@@ -80,8 +77,11 @@ public class CacheExecutorInterceptor implements Interceptor {
         if (invocation.getMethod().getName().equals("update")) {
             Object result = invocation.proceed();
             if (isCache && cacheTableConfig != null && cacheTableConfig.getIsCache()) {
-                if (cacheTableConfig.getGeneratedKey() != null && mappedStatement.getKeyProperties() != null && mappedStatement.getKeyProperties().length > 0) {
-                    cacheSql.getParameterMap().put(cacheTableConfig.getGeneratedKey(), mappedStatement.getConfiguration().newMetaObject(boundSql.getParameterObject()).getValue(mappedStatement.getKeyProperties()[0]));
+                if (mappedStatement.getSqlCommandType() == SqlCommandType.INSERT && cacheTableConfig.getGeneratedKeys() != null && mappedStatement.getKeyProperties() != null && mappedStatement.getKeyProperties().length > 0) {
+                    MetaObject metaObject = mappedStatement.getConfiguration().newMetaObject(boundSql.getParameterObject());
+                    for (int i = 0; i < mappedStatement.getKeyProperties().length; i++) {
+                        cacheSql.getParameterMap().put(cacheTableConfig.getGeneratedKeys().get(i), metaObject.getValue(mappedStatement.getKeyProperties()[i]));
+                    }
                 }
                 cacheTableConfig.getCacheHandler().updateKeys(cacheTableConfig, cacheSql);
             }

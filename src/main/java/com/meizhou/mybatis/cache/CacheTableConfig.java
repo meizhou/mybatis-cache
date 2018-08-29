@@ -21,27 +21,27 @@ public class CacheTableConfig {
 
     private ICacheHandler cacheHandler;
 
-    private String generatedKey;
+    private List<String> generatedKeys;
 
-    public static CacheTableConfig build(String prefix, String tableName, List<String> cacheKeys,String generatedKey, ICacheClient cacheClient) {
+    public static CacheTableConfig build(String prefix, String tableName, List<String> cacheKeys, List<String> generatedKeys, ICacheClient cacheClient) {
         CacheTableConfig cacheTableConfig = new CacheTableConfig();
         cacheTableConfig.setPrefix(prefix);
         cacheTableConfig.setTableName(tableName);
         cacheTableConfig.setCacheKeys(cacheKeys);
         cacheTableConfig.setCacheClient(cacheClient);
-        cacheTableConfig.setGeneratedKey(generatedKey);
+        cacheTableConfig.setGeneratedKeys(generatedKeys);
         cacheTableConfig.setCacheHandler(new CommonCacheHandler());
         cacheTableConfig.setIsCache(true);
         cacheTableConfig.setExpireTime(7 * 3600 * 24);
         return cacheTableConfig;
     }
 
-    public String getGeneratedKey() {
-        return generatedKey;
+    public List<String> getGeneratedKeys() {
+        return generatedKeys;
     }
 
-    public void setGeneratedKey(String generatedKey) {
-        this.generatedKey = generatedKey;
+    public void setGeneratedKeys(List<String> generatedKeys) {
+        this.generatedKeys = generatedKeys;
     }
 
     public String getPrefix() {
