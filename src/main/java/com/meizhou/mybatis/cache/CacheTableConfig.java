@@ -99,4 +99,16 @@ public class CacheTableConfig {
     public void setCacheHandler(ICacheHandler cacheHandler) {
         this.cacheHandler = cacheHandler;
     }
+
+    @Override
+    public String toString() {
+        return "CacheTableConfig{" +
+                "prefix='" + prefix + '\'' +
+                ", tableName='" + tableName + '\'' +
+                ", cacheKeys=" + cacheKeys +
+                ", expireTime=" + expireTime +
+                ", isCache=" + isCache +
+                ", generatedKeys=" + generatedKeys +
+                '}';
+    }
 }

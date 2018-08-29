@@ -113,7 +113,7 @@ public class CacheSql {
     @Override
     public String toString() {
         return "CacheSql{" +
-                "sql='" + sql + '\'' +
+                "sql='" + sql.replaceAll("\n","") + '\'' +
                 ", table='" + table + '\'' +
                 ", parameterMap=" + parameterMap +
                 '}';
