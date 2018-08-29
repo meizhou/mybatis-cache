@@ -80,6 +80,9 @@ public class CacheExecutorInterceptor implements Interceptor {
         if (invocation.getMethod().getName().equals("update")) {
             Object result = invocation.proceed();
             if (isCache && cacheTableConfig != null && cacheTableConfig.getIsCache()) {
+                if (cacheTableConfig.getGeneratedKey() != null && mappedStatement.getKeyProperties() != null && mappedStatement.getKeyProperties().length > 0) {
+                    cacheSql.getParameterMap().put(cacheTableConfig.getGeneratedKey(), mappedStatement.getConfiguration().newMetaObject(boundSql.getParameterObject()).getValue(mappedStatement.getKeyProperties()[0]));
+                }
                 cacheTableConfig.getCacheHandler().updateKeys(cacheTableConfig, cacheSql);
             }
             return result;

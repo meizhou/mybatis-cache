@@ -13,8 +13,6 @@ public class CacheTableConfig {
 
     private List<String> cacheKeys;
 
-    private Boolean isSharding = false;
-
     private Integer expireTime = 7 * 3600 * 24;
 
     private Boolean isCache = true;
@@ -23,27 +21,27 @@ public class CacheTableConfig {
 
     private ICacheHandler cacheHandler;
 
-    private Boolean isSkipInsertException = true;
+    private String generatedKey;
 
-    public static CacheTableConfig build(String prefix, String tableName, List<String> cacheKeys, ICacheClient cacheClient) {
+    public static CacheTableConfig build(String prefix, String tableName, List<String> cacheKeys,String generatedKey, ICacheClient cacheClient) {
         CacheTableConfig cacheTableConfig = new CacheTableConfig();
         cacheTableConfig.setPrefix(prefix);
         cacheTableConfig.setTableName(tableName);
         cacheTableConfig.setCacheKeys(cacheKeys);
         cacheTableConfig.setCacheClient(cacheClient);
+        cacheTableConfig.setGeneratedKey(generatedKey);
         cacheTableConfig.setCacheHandler(new CommonCacheHandler());
         cacheTableConfig.setIsCache(true);
         cacheTableConfig.setExpireTime(7 * 3600 * 24);
-        cacheTableConfig.setIsSkipInsertException(true);
         return cacheTableConfig;
     }
 
-    public Boolean getIsSkipInsertException() {
-        return isSkipInsertException;
+    public String getGeneratedKey() {
+        return generatedKey;
     }
 
-    public void setIsSkipInsertException(Boolean isSkipInsertException) {
-        this.isSkipInsertException = isSkipInsertException;
+    public void setGeneratedKey(String generatedKey) {
+        this.generatedKey = generatedKey;
     }
 
     public String getPrefix() {
@@ -68,14 +66,6 @@ public class CacheTableConfig {
 
     public void setCacheKeys(List<String> cacheKeys) {
         this.cacheKeys = cacheKeys;
-    }
-
-    public Boolean getIsSharding() {
-        return isSharding;
-    }
-
-    public void setIsSharding(Boolean isSharding) {
-        this.isSharding = isSharding;
     }
 
     public Integer getExpireTime() {
