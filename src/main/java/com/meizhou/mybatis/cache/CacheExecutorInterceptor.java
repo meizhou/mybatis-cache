@@ -56,6 +56,9 @@ public class CacheExecutorInterceptor implements Interceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
+        if (!isCache) {
+            return invocation.proceed();
+        }
         MappedStatement mappedStatement = (MappedStatement) invocation.getArgs()[0];
         BoundSql boundSql = mappedStatement.getBoundSql(invocation.getArgs()[1]);
         List<Object> objectList = genParameterObjectList(mappedStatement, boundSql);
