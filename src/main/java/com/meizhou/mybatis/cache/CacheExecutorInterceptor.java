@@ -9,7 +9,9 @@ import org.apache.ibatis.session.RowBounds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Created by meizhou on 2018/8/18.
@@ -103,10 +105,12 @@ public class CacheExecutorInterceptor implements Interceptor {
         this.dbType = properties.getProperty("dbType", "mysql");
         this.isCache = Boolean.parseBoolean(properties.getProperty("isCache", "true"));
         String classType = properties.getProperty("cacheExecutorConfig");
-        try {
-            this.abstractCacheExecutorConfig = (AbstractCacheExecutorConfig) Class.forName(classType).newInstance();
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+        if (classType != null) {
+            try {
+                this.abstractCacheExecutorConfig = (AbstractCacheExecutorConfig) Class.forName(classType).newInstance();
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
         }
     }
 }
