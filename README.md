@@ -12,7 +12,7 @@ public class FlyCacheExecutorConfig extends AbstractCacheExecutorConfig {
 
     public FlyCacheExecutorConfig() {
         ICacheClient cacheClient = new RedisCacheClient("localhost", 6379, "123456");
-        CacheTableConfig cacheTableConfig = CacheTableConfig.build("v20", "shop", Lists.newArrayList("id"), cacheClient);
+        CacheTableConfig cacheTableConfig = CacheTableConfig.build("v20", "shop", Lists.newArrayList("id"),Lists.newArrayList("id"), cacheClient);
         cacheTableConfigMap.put("shop", cacheTableConfig);
         for (int i = 0; i < 1024; i++) {
             cacheTableConfigMap.put("shop_" + i, cacheTableConfig);
