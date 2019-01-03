@@ -29,6 +29,7 @@ public class FlyCacheExecutorConfig extends AbstractCacheExecutorConfig {
 ```
 <plugin interceptor="com.meizhou.mybatis.cache.CacheExecutorInterceptor">
     <property name="dbType" value="mysql"/>
+    <property name="isCache" value="true"/>
     <property name="cacheExecutorConfig" value="com.meizhou.fly.server.constant.FlyCacheExecutorConfig"/>
 </plugin>
 ```
